@@ -1,26 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Difficulty = "easy" | "hard" | "veryhard" | "ultrahard";
 
-const difficultyTimes: Record<Difficulty, number> = {
-  easy: 10,
-  hard: 5,
-  veryhard: 3,
-  ultrahard: 2,
-};
-
-const difficultyLabels: Record<Difficulty, string> = {
-  easy: "Easy (10s / question)",
-  hard: "Hard (5s / question)",
-  veryhard: "Very Hard (3s / question)",
-  ultrahard: "Ultra Hard (2s / question)",
-};
-
 export default function MathGame() {
+  const difficultyTimes: Record<Difficulty, number> = {
+    easy: 10,
+    hard: 5,
+    veryhard: 3,
+    ultrahard: 2,
+  };
+
+  // --- MUSIC STATE & REF ---
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMusicOn, setIsMusicOn] = useState(true);
+
   // --- GAME STATES ---
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [lives, setLives] = useState(3);
   const [score, setScore] = useState(0);
 
@@ -29,6 +26,40 @@ export default function MathGame() {
   const [answers, setAnswers] = useState<number[]>([]);
 
   const [gameOver, setGameOver] = useState(false);
+  const [lastDifficulty, setLastDifficulty] = useState<Difficulty | null>(null);
+
+  // --- SETUP AUDIO ONCE ---
+  useEffect(() => {
+    if (!audioRef.current) {
+      const audio = new Audio("/math-blitz-theme.mp3");
+      audio.loop = true;
+      audio.volume = 0.4; // calm / educational vibe, not too loud
+      audioRef.current = audio;
+    }
+
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  // --- CONTROL MUSIC BASED ON STATE ---
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isMusicOn && difficulty && !gameOver) {
+      // Browser might block autoplay until user interaction,
+      // but this will work once they click a button (like difficulty select).
+      audio
+        .play()
+        .catch(() => {
+          // ignore autoplay errors
+        });
+    } else {
+      audio.pause();
+    }
+  }, [isMusicOn, difficulty, gameOver]);
 
   // --- GENERATE RANDOM QUESTION ---
   const generateQuestion = () => {
@@ -46,70 +77,75 @@ export default function MathGame() {
       correct = a * b;
       setQuestion(`${a} × ${b}`);
     } else {
-      // division with clean result
+      // division (clean integer)
       const divisor = b;
       const product = a * b;
-      correct = a; // product ÷ divisor = a
+      correct = a;
       setQuestion(`${product} ÷ ${divisor}`);
     }
 
-    // false answer
+    // false answer generation
     let wrong = correct + (Math.random() > 0.5 ? 1 : -1);
     if (wrong === correct) wrong += 2;
 
-    // shuffle left/right positions
+    // shuffle positions
     setAnswers(Math.random() > 0.5 ? [correct, wrong] : [wrong, correct]);
     setCorrectAnswer(correct);
   };
 
-  // --- START / RESTART GAME WITH DIFFICULTY ---
+  // --- START GAME WITH DIFFICULTY ---
   const startGame = (d: Difficulty) => {
     setDifficulty(d);
+    setLastDifficulty(d);
     setLives(3);
     setScore(0);
-    setGameOver(false);
     setTimeLeft(difficultyTimes[d]);
+    setGameOver(false);
     generateQuestion();
+
+    // Try to start music when player explicitly starts game
+    if (audioRef.current && isMusicOn) {
+      audioRef.current
+        .play()
+        .catch(() => {
+          // ignore autoplay block
+        });
+    }
   };
 
-  // --- TIMER EFFECT (per question) ---
+  // --- TIMER ---
   useEffect(() => {
     if (!difficulty || gameOver) return;
 
     if (timeLeft <= 0) {
-      // time ran out → lose a life
       setLives((prevLives) => {
         const newLives = prevLives - 1;
-
         if (newLives <= 0) {
           setGameOver(true);
           return 0;
         }
 
-        // still alive → next question + reset timer
+        // still alive → next question & reset timer
         setTimeLeft(difficultyTimes[difficulty]);
         generateQuestion();
         return newLives;
       });
-
       return;
     }
 
-    const id = setTimeout(() => {
+    const interval = setInterval(() => {
       setTimeLeft((t) => t - 1);
     }, 1000);
 
-    return () => clearTimeout(id);
+    return () => clearInterval(interval);
   }, [timeLeft, difficulty, gameOver]);
 
   // --- USER SELECTS ANSWER ---
   const chooseAnswer = (value: number) => {
-    if (!difficulty || gameOver) return;
+    if (!difficulty) return;
 
     if (value === correctAnswer) {
       setScore((s) => s + 1);
-      setTimeLeft(difficultyTimes[difficulty]);
-      generateQuestion();
     } else {
       setLives((prevLives) => {
         const newLives = prevLives - 1;
@@ -117,91 +153,119 @@ export default function MathGame() {
           setGameOver(true);
           return 0;
         }
-        // still alive → next question
-        setTimeLeft(difficultyTimes[difficulty]);
-        generateQuestion();
         return newLives;
       });
     }
+
+    // reset timer + new question (if not game over)
+    if (!gameOver) {
+      setTimeLeft(difficultyTimes[difficulty]);
+      generateQuestion();
+    }
   };
 
-  // --- DIFFICULTY SELECTION SCREEN ---
-  if (!difficulty && !gameOver) {
+  const toggleMusic = () => {
+    setIsMusicOn((prev) => !prev);
+  };
+
+  // --- GAME OVER SCREEN ---
+  if (gameOver) {
     return (
-      <div className="text-center p-4">
-        <h1 className="text-3xl font-bold mb-4">Math Blitz</h1>
-        <p className="mb-6 text-gray-700">
-          Choose difficulty. You have 3 lives. Answer before the timer runs out!
-        </p>
+      <div className="text-center mt-10 px-4">
+        <h1 className="text-3xl font-bold mb-2">Game Over</h1>
+        <p className="text-lg mb-1">Score: {score}</p>
+        {lastDifficulty && (
+          <p className="text-sm text-gray-600 mb-4">
+            Difficulty played:{" "}
+            <span className="font-semibold capitalize">
+              {lastDifficulty === "veryhard"
+                ? "Very Hard"
+                : lastDifficulty === "ultrahard"
+                ? "Ultra Hard"
+                : lastDifficulty}
+            </span>
+          </p>
+        )}
+
+        <button
+          onClick={toggleMusic}
+          className="mb-4 px-4 py-2 rounded-full border text-sm"
+        >
+          {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
+        </button>
+
+        <h2 className="text-xl font-semibold mb-3">Play Again – Select Difficulty</h2>
 
         <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
           <button
             onClick={() => startGame("easy")}
-            className="bg-green-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-green-500 text-white py-3 rounded-lg text-sm"
           >
-            Easy<br />10s
+            Easy (10s)
           </button>
           <button
             onClick={() => startGame("hard")}
-            className="bg-yellow-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-yellow-500 text-white py-3 rounded-lg text-sm"
           >
-            Hard<br />5s
+            Hard (5s)
           </button>
           <button
             onClick={() => startGame("veryhard")}
-            className="bg-red-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-red-500 text-white py-3 rounded-lg text-sm"
           >
-            Very Hard<br />3s
+            Very Hard (3s)
           </button>
           <button
             onClick={() => startGame("ultrahard")}
-            className="bg-purple-600 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-purple-600 text-white py-3 rounded-lg text-sm"
           >
-            Ultra Hard<br />2s
+            Ultra Hard (2s)
           </button>
         </div>
       </div>
     );
   }
 
-  // --- GAME OVER SCREEN ---
-  if (gameOver && difficulty) {
+  // --- DIFFICULTY SELECTION SCREEN ---
+  if (!difficulty) {
     return (
-      <div className="text-center p-4">
-        <h1 className="text-3xl font-bold mb-4">Game Over</h1>
-        <p className="text-lg mb-2">Your Score: <span className="font-semibold">{score}</span></p>
-        <p className="text-md mb-6">
-          Difficulty played:{" "}
-          <span className="font-semibold">
-            {difficultyLabels[difficulty]}
-          </span>
+      <div className="text-center mt-10 px-4">
+        <h1 className="text-3xl font-bold mb-4">Math Blitz</h1>
+        <p className="mb-4 text-gray-700">
+          Choose a difficulty and see how long you can survive!
         </p>
 
-        <h2 className="text-xl font-semibold mb-3">Play Again</h2>
+        <button
+          onClick={toggleMusic}
+          className="mb-4 px-4 py-2 rounded-full border text-sm"
+        >
+          {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
+        </button>
+
         <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
           <button
             onClick={() => startGame("easy")}
-            className="bg-green-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-green-500 text-white py-3 rounded-lg text-sm"
           >
-            Easy<br />10s
+            Easy (10s)
           </button>
           <button
             onClick={() => startGame("hard")}
-            className="bg-yellow-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-yellow-500 text-white py-3 rounded-lg text-sm"
           >
-            Hard<br />5s
+            Hard (5s)
           </button>
           <button
             onClick={() => startGame("veryhard")}
-            className="bg-red-500 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-red-500 text-white py-3 rounded-lg text-sm"
           >
-            Very Hard<br />3s
+            Very Hard (3s)
           </button>
           <button
             onClick={() => startGame("ultrahard")}
-            className="bg-purple-600 text-white py-3 rounded-lg text-sm font-semibold"
+            className="bg-purple-600 text-white py-3 rounded-lg text-sm"
           >
-            Ultra Hard<br />2s
+            Ultra Hard (2s)
           </button>
         </div>
       </div>
@@ -211,38 +275,33 @@ export default function MathGame() {
   // --- MAIN GAME UI ---
   return (
     <div className="text-center p-4">
-      <div className="flex justify-between items-center mb-3 text-sm">
-        <span className="px-3 py-1 rounded-full bg-gray-200 text-gray-800">
-          Lives: {"❤️".repeat(lives)}{" ".repeat(3 - lives)}
-        </span>
-        {difficulty && (
-          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 capitalize">
-            {difficultyLabels[difficulty].split(" ")[0]} {/* Easy / Hard / Very / Ultra */}
-          </span>
-        )}
-      </div>
-
-      <div className="flex justify-between items-center mb-4 text-sm">
-        <span>Score: <span className="font-semibold">{score}</span></span>
-        <span className="text-red-600 font-semibold">
-          Time: {timeLeft}s
-        </span>
+      <div className="flex items-center justify-between mb-4 max-w-md mx-auto">
+        <div className="text-left">
+          <p className="text-sm">Lives: ❤️ {lives}</p>
+          <p className="text-sm">Score: {score}</p>
+        </div>
+        <button
+          onClick={toggleMusic}
+          className="px-3 py-1 rounded-full border text-xs"
+        >
+          {isMusicOn ? "🔊 On" : "🔇 Off"}
+        </button>
+        <p className="text-sm">Time: {timeLeft}s</p>
       </div>
 
       <p className="text-4xl font-bold mb-6">{question}</p>
 
-      {/* Answer buttons: left & right */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-6">
         <button
           onClick={() => chooseAnswer(answers[0])}
-          className="flex-1 max-w-[140px] bg-blue-500 active:bg-blue-600 text-white px-4 py-4 text-xl rounded-xl"
+          className="bg-blue-500 text-white px-6 py-4 text-xl rounded-xl min-w-[100px]"
         >
           {answers[0]}
         </button>
 
         <button
           onClick={() => chooseAnswer(answers[1])}
-          className="flex-1 max-w-[140px] bg-orange-500 active:bg-orange-600 text-white px-4 py-4 text-xl rounded-xl"
+          className="bg-orange-500 text-white px-6 py-4 text-xl rounded-xl min-w-[100px]"
         >
           {answers[1]}
         </button>
