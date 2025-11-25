@@ -1,6 +1,11 @@
 import MathGame from "@/components/MathGame";
+import { sdk } from '@farcaster/miniapp-sdk';
+import { useEffect } from 'react';
 
 export default function MathPage() {
+  useEffect(() => {
+        sdk.actions.ready();
+    }, []);
   return (
     <div className="min-h-screen bg-gray-100 flex items-start justify-center py-6 px-3">
       <div className="w-full max-w-md">
