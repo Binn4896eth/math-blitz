@@ -24,7 +24,7 @@ return Response.json({
     "splashBackgroundColor": "#020617",
     "webhookUrl": "https://math-blitz.vercel.app/api/webhook",
     "subtitle": "Fast math, faster reflexes",
-    "description": "Math Blitz is a fast-paced math game with lives, difficulties, and a countdown on every question. Test your brain with addition, multiplication, and division under pressure.",
+    "description": "Math Blitz is a fast, challenging math game with lives, difficulty levels, and a countdown on each question. Solve addition, multiplication, and division under pressure.",
     "screenshotUrls": [
       "https://math-blitz.vercel.app/screenshots/screen1.png",
       "https://math-blitz.vercel.app/screenshots/screen2.png",
@@ -33,7 +33,7 @@ return Response.json({
     "primaryCategory": "games",
     "tags": ["math", "game", "miniapp", "baseapp", "education"],
     "heroImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",
-    "tagline": "Beat the timer, save your lives.",
+    "tagline": "Beat the timer, stay alive.",
     "ogTitle": "Math Blitz – Beat the Clock",
     "ogDescription": "Choose your difficulty and race the timer in this high-speed math challenge.",
     "ogImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",

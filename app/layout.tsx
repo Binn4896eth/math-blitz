@@ -2,8 +2,30 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Math Games",
+  
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+      title: "Math Blitz",
+        other: {
+        'fc:miniapp': JSON.stringify({
+            version: 'next',
+            imageUrl: 'https://math-blitz.vercel.app/embed-image',
+            button: {
+                title: `Launch Math Blitz`,
+                action: {
+                    type: 'launch_miniapp',
+                    name: 'Math Blitz',
+                    url: 'https://math-blitz-nine.vercel.app/',
+                    splashImageUrl: 'https://math-blitz-nine.vercel.app/math-blitz-logo.png',
+                    splashBackgroundColor: '#4d56f8ff',
+                },
+            },
+        }),
+        },
+    };
+    }
 
 export default function RootLayout({
   children,
