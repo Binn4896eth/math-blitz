@@ -28,7 +28,7 @@ return Response.json({
     "screenshotUrls": [
       "https://math-blitz-nine.vercel.app/screenshots/screen1.png",
       "https://math-blitz-nine.vercel.app/screenshots/screen2.png",
-      "https://math-blitz.vercel.app/screenshots/screen3.png"
+      "https://math-blitz-nine.vercel.app/screenshots/screen3.png"
     ],
     "primaryCategory": "games",
     "tags": ["math", "game", "miniapp", "baseapp", "education"],
