@@ -18,25 +18,25 @@ return Response.json({
   "miniapp": {
     "version": "1",
     "name": "Math Blitz",
-    "homeUrl": "https://math-blitz.vercel.app",
-    "iconUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
+    "homeUrl": "https://math-blitz-nine.vercel.app",
+    "iconUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
     "splashImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
     "splashBackgroundColor": "#020617",
-    "webhookUrl": "https://math-blitz.vercel.app/api/webhook",
+    "webhookUrl": "https://math-blitz-nine.vercel.app/api/webhook",
     "subtitle": "Fast math, faster reflexes",
     "description": "Math Blitz is a fast, challenging math game with lives, difficulty levels, and a countdown on each question. Solve addition, multiplication, and division under pressure.",
     "screenshotUrls": [
-      "https://math-blitz.vercel.app/screenshots/screen1.png",
-      "https://math-blitz.vercel.app/screenshots/screen2.png",
+      "https://math-blitz-nine.vercel.app/screenshots/screen1.png",
+      "https://math-blitz-nine.vercel.app/screenshots/screen2.png",
       "https://math-blitz.vercel.app/screenshots/screen3.png"
     ],
     "primaryCategory": "games",
     "tags": ["math", "game", "miniapp", "baseapp", "education"],
-    "heroImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
+    "heroImageUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
     "tagline": "Beat the timer, stay alive.",
     "ogTitle": "Math Blitz – Beat the Clock",
     "ogDescription": "Choose your difficulty and race the timer in this high-speed math challenge.",
-    "ogImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
+    "ogImageUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
     "noindex": true
   }
 }); // see the next step for the manifest_json_object
