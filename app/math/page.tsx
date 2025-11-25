@@ -1,3 +1,5 @@
+"use client";
+
 import MathGame from "@/components/MathGame";
 import { sdk } from '@farcaster/miniapp-sdk';
 import { useEffect } from 'react';
