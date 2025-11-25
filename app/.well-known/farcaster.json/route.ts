@@ -32,11 +32,11 @@ return Response.json({
     ],
     "primaryCategory": "games",
     "tags": ["math", "game", "miniapp", "baseapp", "education"],
-    "heroImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",
+    "heroImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
     "tagline": "Beat the timer, stay alive.",
     "ogTitle": "Math Blitz – Beat the Clock",
     "ogDescription": "Choose your difficulty and race the timer in this high-speed math challenge.",
-    "ogImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",
+    "ogImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
     "noindex": true
   }
 }); // see the next step for the manifest_json_object
