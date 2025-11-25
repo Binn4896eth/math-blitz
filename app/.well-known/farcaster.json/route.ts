@@ -13,30 +13,30 @@ return Response.json({
     "signature": "uGqD/eWWuIB7R+Gznp4Ouf52Y8Ni39mriM64wO8LQ8RGUxZr+Cf6OoTHMOjWFjmhPeiskK4BjbfVmYsfjfKNCxw="
   },
   "baseBuilder": {
-    "ownerAddress": "0x" // add your Base Account address here
+    "ownerAddress": "0x499184D108bb3dd6B085304E8E6F4370eABAa803" // add your Base Account address here
   },
   "miniapp": {
     "version": "1",
-    "name": "Example Mini App",
-    "homeUrl": "https://ex.co",
-    "iconUrl": "https://ex.co/i.png",
-    "splashImageUrl": "https://ex.co/l.png",
-    "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://ex.co/api/webhook",
-    "subtitle": "Fast, fun, social",
-    "description": "A fast, fun way to challenge friends in real time.",
+    "name": "Math Blitz",
+    "homeUrl": "https://math-blitz.vercel.app",
+    "iconUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
+    "splashImageUrl": "https://math-blitz.vercel.app/math-blitz-logo.png",
+    "splashBackgroundColor": "#020617",
+    "webhookUrl": "https://math-blitz.vercel.app/api/webhook",
+    "subtitle": "Fast math, faster reflexes",
+    "description": "Math Blitz is a fast-paced math game with lives, difficulties, and a countdown on every question. Test your brain with addition, multiplication, and division under pressure.",
     "screenshotUrls": [
-      "https://ex.co/s1.png",
-      "https://ex.co/s2.png",
-      "https://ex.co/s3.png"
+      "https://math-blitz.vercel.app/screenshots/screen1.png",
+      "https://math-blitz.vercel.app/screenshots/screen2.png",
+      "https://math-blitz.vercel.app/screenshots/screen3.png"
     ],
-    "primaryCategory": "social",
-    "tags": ["example", "miniapp", "baseapp"],
-    "heroImageUrl": "https://ex.co/og.png",
-    "tagline": "Play instantly",
-    "ogTitle": "Example Mini App",
-    "ogDescription": "Challenge friends in real time.",
-    "ogImageUrl": "https://ex.co/og.png",
+    "primaryCategory": "games",
+    "tags": ["math", "game", "miniapp", "baseapp", "education"],
+    "heroImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",
+    "tagline": "Beat the timer, save your lives.",
+    "ogTitle": "Math Blitz – Beat the Clock",
+    "ogDescription": "Choose your difficulty and race the timer in this high-speed math challenge.",
+    "ogImageUrl": "https://math-blitz.vercel.app/og-math-blitz.png",
     "noindex": true
   }
 }); // see the next step for the manifest_json_object
