@@ -13,12 +13,12 @@ return Response.json({
     "signature": ""
   },
   "baseBuilder": {
-    "ownerAddress": "0xa27244ea9c2d98577aae01433fac2e83c4a8b063" // add your Base Account address here
+    "ownerAddress": "0x" // add your Base Account address here
   },
   "miniapp": {
     "version": "1",
-    "name": "Math Blitz",
-    "homeUrl": "https://math-blitz-nine.vercel.app/",
+    "name": "Example Mini App",
+    "homeUrl": "https://ex.co",
     "iconUrl": "https://ex.co/i.png",
     "splashImageUrl": "https://ex.co/l.png",
     "splashBackgroundColor": "#000000",
@@ -30,11 +30,11 @@ return Response.json({
       "https://ex.co/s2.png",
       "https://ex.co/s3.png"
     ],
-    "primaryCategory": "games",
+    "primaryCategory": "social",
     "tags": ["example", "miniapp", "baseapp"],
     "heroImageUrl": "https://ex.co/og.png",
     "tagline": "Play instantly",
-    "ogTitle": "Math Blitz",
+    "ogTitle": "Example Mini App",
     "ogDescription": "Challenge friends in real time.",
     "ogImageUrl": "https://ex.co/og.png",
     "noindex": true
