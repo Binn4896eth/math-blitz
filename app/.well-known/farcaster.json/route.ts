@@ -19,8 +19,8 @@ return Response.json({
     "version": "1",
     "name": "Math Blitz",
     "homeUrl": "https://math-blitz-nine.vercel.app",
-    "iconUrl": "https://imgur.com/a/O8tVwNF",
-    "splashImageUrl": "https://imgur.com/a/O8tVwNF",
+    "iconUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
+    "splashImageUrl": "https://imgur.com/a/TOceCaM",
     "splashBackgroundColor": "#020617",
     "webhookUrl": "https://math-blitz-nine.vercel.app/api/webhook",
     "subtitle": "Fast math, faster reflexes",
@@ -32,11 +32,11 @@ return Response.json({
     ],
     "primaryCategory": "games",
     "tags": ["math", "game", "miniapp", "baseapp", "education"],
-    "heroImageUrl": "https://imgur.com/a/O8tVwNF",
+    "heroImageUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
     "tagline": "Beat the timer, stay alive.",
     "ogTitle": "Math Blitz – Beat the Clock",
     "ogDescription": "Choose your difficulty and race the timer in this high-speed math challenge.",
-    "ogImageUrl": "https://imgur.com/a/O8tVwNF",
+    "ogImageUrl": "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
     "noindex": true
   }
 }); // see the next step for the manifest_json_object
