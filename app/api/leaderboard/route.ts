@@ -10,10 +10,11 @@ export async function GET(req: Request) {
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  const entries = await kv.zrange("leaderboard:alltime", start, end, {
+  const entries = await kv.zrange("leaderboard:ultrahard", start, end, {
     withScores: true,
     rev: true,
-  });
+    });
+
 
   const leaderboard: { fid: string; username: string; score: number }[] = [];
 

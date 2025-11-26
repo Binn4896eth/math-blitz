@@ -8,8 +8,8 @@ const MAX_TIME_DRIFT = 1000 * 5; // 5s
 
 export async function POST(req: Request) {
   try {
-    const { fid, username, score, timestamp, sessionId, hash } =
-      await req.json();
+    const { fid, username, score, difficulty, timestamp, sessionId, hash } = await req.json();
+
 
     if (!fid || typeof score !== "number" || !timestamp || !sessionId || !hash) {
       return new Response("Invalid payload", { status: 400 });
@@ -39,17 +39,22 @@ export async function POST(req: Request) {
     }
 
     await kv.hset(`user:${fid}`, {
-      fid,
-      username,
+    fid,
+    username,
+    difficulty, // store last mode used for highest score
     });
 
     const currentScore = await kv.zscore("leaderboard:alltime", fid.toString());
 
     if (!currentScore || score > currentScore) {
-      await kv.zadd("leaderboard:alltime", {
+      await kv.zadd("leaderboard:ultrahard", {
         member: fid.toString(),
         score,
-      });
+        });
+    }
+
+    if (difficulty !== "ultrahard") {
+    return Response.json({ ignored: true, message: "Only Ultra Hard scores count" });
     }
 
     return Response.json({ success: true });

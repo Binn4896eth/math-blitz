@@ -197,6 +197,7 @@ export default function MathGame({ fid, username }: MathGameProps) {
           fid,
           username,
           score,
+          difficulty: lastDifficulty,   // add difficulty here
           timestamp,
           sessionId,
           hash,

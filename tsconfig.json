@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/MathGame.tsx"  ],
+, "components/MathGame.tsx", "app/math/page.jsx", "app/math/page.jsx"  ],
   "exclude": ["node_modules"]
 }

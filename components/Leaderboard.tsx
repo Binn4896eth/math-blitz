@@ -43,7 +43,10 @@ export default function Leaderboard({ onClose }: LeaderboardProps) {
           ×
         </button>
 
-        <h1 className="text-2xl font-bold text-center mb-4">🏆 Leaderboard</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">
+        🏆 Ultra Hard Leaderboard
+        </h1>
+
 
         {loading ? (
           <p className="text-center text-gray-500">Loading…</p>
