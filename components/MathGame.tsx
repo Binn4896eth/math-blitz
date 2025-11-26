@@ -49,8 +49,6 @@ export default function MathGame() {
     if (!audio) return;
 
     if (isMusicOn && difficulty && !gameOver) {
-      // Browser might block autoplay until user interaction,
-      // but this will work once they click a button (like difficulty select).
       audio
         .play()
         .catch(() => {
@@ -168,111 +166,167 @@ export default function MathGame() {
     setIsMusicOn((prev) => !prev);
   };
 
+
   // --- GAME OVER SCREEN ---
-  if (gameOver) {
-    return (
-      <div className="text-center mt-10 px-4">
-        <h1 className="text-3xl font-bold mb-2">Game Over</h1>
-        <p className="text-lg mb-1">Score: {score}</p>
-        {lastDifficulty && (
-          <p className="text-sm text-gray-600 mb-4">
-            Difficulty played:{" "}
-            <span className="font-semibold capitalize">
-              {lastDifficulty === "veryhard"
-                ? "Very Hard"
-                : lastDifficulty === "ultrahard"
-                ? "Ultra Hard"
-                : lastDifficulty}
-            </span>
+if (gameOver) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-sky-50 via-emerald-50 to-slate-50 px-4">
+      <div className="max-w-sm w-full bg-white/90 border border-slate-200 rounded-3xl shadow-lg px-6 py-8 text-center relative overflow-hidden">
+
+        {/* Soft glow behind score */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-200/40 to-transparent blur-2xl" />
+        </div>
+
+        <h1 className="text-2xl font-semibold text-slate-800 mb-2">Game Over</h1>
+
+        {/* BEAUTIFUL SCORE */}
+        <div className="mt-4 mb-6">
+          <p className="text-[11px] tracking-[0.25em] text-slate-500 uppercase mb-2">
+            Score
           </p>
+
+          <div className="relative inline-block">
+            <span className="absolute inset-0 bg-emerald-300 blur-2xl opacity-30 rounded-full"></span>
+
+            <p className="relative text-7xl font-extrabold text-emerald-600 drop-shadow-sm">
+              {score}
+            </p>
+          </div>
+
+          <p className="text-xs text-slate-500 mt-3">
+            {score === 0
+              ? "Try again!"
+              : score < 5
+              ? "Warm-up complete."
+              : score < 10
+              ? "Nice run!"
+              : "Amazing!"}
+          </p>
+        </div>
+
+        {/* MODE – SIMPLE & CLEAN */}
+        {lastDifficulty && (
+          <div className="mb-6">
+            <p className="text-[11px] text-slate-500 mb-2 text-center">Mode</p>
+            <div className="flex justify-center">
+              <span
+                className={`px-4 py-1.5 rounded-full text-xs font-medium border
+                ${
+                  lastDifficulty === "easy"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : lastDifficulty === "hard"
+                    ? "bg-sky-50 text-sky-700 border-sky-200"
+                    : lastDifficulty === "veryhard"
+                    ? "bg-orange-50 text-orange-700 border-orange-200"
+                    : "bg-rose-50 text-rose-700 border-rose-200"
+                }`}
+              >
+                {lastDifficulty === "veryhard"
+                  ? "Very Hard"
+                  : lastDifficulty === "ultrahard"
+                  ? "Ultra Hard"
+                  : lastDifficulty.charAt(0).toUpperCase() +
+                    lastDifficulty.slice(1)}
+              </span>
+            </div>
+          </div>
         )}
 
+        {/* Music Toggle */}
         <button
           onClick={toggleMusic}
-          className="mb-4 px-4 py-2 rounded-full border text-sm"
+          className="mb-5 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-xs text-slate-600"
         >
           {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
         </button>
 
-        <h2 className="text-xl font-semibold mb-3">Play Again – Select Difficulty</h2>
+        {/* Play Again */}
+        <p className="text-xs text-slate-500 mb-3">Play again:</p>
 
-        <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+        <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
           <button
             onClick={() => startGame("easy")}
-            className="bg-green-500 text-white py-3 rounded-lg text-sm"
+            className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-xs font-medium"
           >
-            Easy (10s)
+            Easy • 10s
           </button>
           <button
             onClick={() => startGame("hard")}
-            className="bg-yellow-500 text-white py-3 rounded-lg text-sm"
+            className="bg-sky-100 text-sky-700 py-3 rounded-xl text-xs font-medium"
           >
-            Hard (5s)
+            Hard • 5s
           </button>
           <button
             onClick={() => startGame("veryhard")}
-            className="bg-red-500 text-white py-3 rounded-lg text-sm"
+            className="bg-orange-100 text-orange-700 py-3 rounded-xl text-xs font-medium"
           >
-            Very Hard (3s)
+            Very Hard • 3s
           </button>
           <button
             onClick={() => startGame("ultrahard")}
-            className="bg-purple-600 text-white py-3 rounded-lg text-sm"
+            className="bg-rose-100 text-rose-700 py-3 rounded-xl text-xs font-medium"
           >
-            Ultra Hard (2s)
+            Ultra • 2s
           </button>
         </div>
+
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+
 
   // --- DIFFICULTY SELECTION SCREEN ---
   if (!difficulty) {
     return (
-      <div className="text-center mt-10 px-4">
-        <h1 className="text-3xl font-bold mb-4">Math Blitz</h1>
-        <p className="mb-4 text-gray-700">
-          Choose a difficulty and see how long you can survive!
-        </p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-sky-50 via-emerald-50 to-slate-50 px-4">
+        <div className="max-w-sm w-full bg-white/90 border border-slate-200 rounded-3xl shadow-md px-6 py-8 text-center">
+          <h1 className="text-3xl font-semibold mb-3 text-slate-800">
+            Math Blitz
+          </h1>
+          <p className="mb-4 text-sm text-slate-600">Choose a difficulty.</p>
 
-        <button
-          onClick={toggleMusic}
-          className="mb-4 px-4 py-2 rounded-full border text-sm"
-        >
-          {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
-        </button>
+          <button
+            onClick={toggleMusic}
+            className="mb-4 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-xs text-slate-600"
+          >
+            {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
+          </button>
 
-        <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
-          <button
-            onClick={() => startGame("easy")}
-            className="bg-green-500 text-white py-3 rounded-lg text-sm"
-          >
-            Easy (10s)
-          </button>
-          <button
-            onClick={() => startGame("hard")}
-            className="bg-yellow-500 text-white py-3 rounded-lg text-sm"
-          >
-            Hard (5s)
-          </button>
-          <button
-            onClick={() => startGame("veryhard")}
-            className="bg-red-500 text-white py-3 rounded-lg text-sm"
-          >
-            Very Hard (3s)
-          </button>
-          <button
-            onClick={() => startGame("ultrahard")}
-            className="bg-purple-600 text-white py-3 rounded-lg text-sm"
-          >
-            Ultra Hard (2s)
-          </button>
+          <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+            <button
+              onClick={() => startGame("easy")}
+              className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-sm font-medium"
+            >
+              Easy • 10s
+            </button>
+            <button
+              onClick={() => startGame("hard")}
+              className="bg-sky-100 text-sky-700 py-3 rounded-xl text-sm font-medium"
+            >
+              Hard • 5s
+            </button>
+            <button
+              onClick={() => startGame("veryhard")}
+              className="bg-orange-100 text-orange-700 py-3 rounded-xl text-sm font-medium"
+            >
+              Very Hard • 3s
+            </button>
+            <button
+              onClick={() => startGame("ultrahard")}
+              className="bg-rose-100 text-rose-700 py-3 rounded-xl text-sm font-medium"
+            >
+              Ultra • 2s
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // --- MAIN GAME UI ---
+  // --- MAIN GAME UI (answer page – kept as you requested) ---
   return (
     <div className="text-center p-4">
       <div className="flex items-center justify-between mb-4 max-w-md mx-auto">
