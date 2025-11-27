@@ -1,6 +1,6 @@
 import { kv } from "@vercel/kv";
 
-// --- Helper functions to normalize KV values safely ---
+// Helpers for KV "unknown" types
 function getStr(value: unknown): string {
   if (typeof value === "string") return value;
   if (value === undefined || value === null) return "";
@@ -14,6 +14,9 @@ function getNum(value: unknown): number {
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json();
+    console.log("📥 Incoming Submit Body:", body);
+
     const {
       fid,
       username,
@@ -22,68 +25,84 @@ export async function POST(req: Request) {
       timestamp,
       sessionId,
       hash,
-    } = await req.json();
+    } = body;
 
     const now = Date.now();
 
-    // --------------------------------------------------
-    // 0. Accept only Ultra Hard mode
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 0. Difficulty check
+    // -----------------------------------------------------
     if (difficulty !== "ultrahard") {
-      return Response.json({ ignored: true });
+      console.warn("⛔ Ignored: Difficulty is not Ultra Hard:", difficulty);
+      return Response.json({ ignored: "difficulty_not_ultrahard" });
     }
 
-    // --------------------------------------------------
-    // 1. Score sanity check
-    // Ultra Hard realistic: < 200 points
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 1. Score sanity
+    // -----------------------------------------------------
     if (typeof score !== "number" || score < 0 || score > 200) {
+      console.warn("⛔ Invalid score:", score);
       return Response.json(
         { success: false, reason: "invalid_score" },
         { status: 400 }
       );
     }
 
-    // --------------------------------------------------
-    // 2. Load stored session (FID + secret)
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 2. Load session
+    // -----------------------------------------------------
     const stored = await kv.hgetall(`session:${sessionId}`);
+    console.log("📦 Loaded Session:", stored);
 
     if (!stored) {
+      console.warn("⛔ No session found!");
       return new Response("Invalid session", { status: 403 });
     }
 
-    // SAFE typed values
     const storedFid = getStr(stored.fid);
     const storedSecret = getStr(stored.sessionSecret);
     const storedCreatedAt = getNum(stored.createdAt);
     const storedUsed = getStr(stored.used);
 
-    // --------------------------------------------------
-    // 3. Ensure session belongs to this user
-    // --------------------------------------------------
+    console.log("🔍 Parsed Stored Values:", {
+      storedFid,
+      storedSecret,
+      storedCreatedAt,
+      storedUsed
+    });
+
+    // -----------------------------------------------------
+    // 3. FID mismatch
+    // -----------------------------------------------------
     if (String(storedFid) !== String(fid)) {
+      console.warn("⛔ FID mismatch:", { storedFid, fid });
       return new Response("FID mismatch", { status: 403 });
     }
 
-    // --------------------------------------------------
-    // 4. Replay protection
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 4. Replay detection
+    // -----------------------------------------------------
     if (storedUsed === "1") {
-      return new Response("Session already used", { status: 403 });
+      console.warn("⛔ Replay detected: session already used");
+      return new Response("Session replay", { status: 403 });
     }
 
-    // --------------------------------------------------
-    // 5. Expiration (2 minutes)
-    // --------------------------------------------------
-    const SESSION_MAX_AGE = 2 * 60 * 1000;
+    // -----------------------------------------------------
+    // 5. Session expiration (2 min)
+    // -----------------------------------------------------
+    const SESSION_MAX_AGE = 120000;
     if (now - storedCreatedAt > SESSION_MAX_AGE) {
+      console.warn("⛔ Session expired:", {
+        now,
+        createdAt: storedCreatedAt,
+        age: now - storedCreatedAt
+      });
       return new Response("Session expired", { status: 403 });
     }
 
-    // --------------------------------------------------
-    // 6. Validate HMAC signature
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 6. HMAC Validation
+    // -----------------------------------------------------
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
       "raw",
@@ -93,54 +112,62 @@ export async function POST(req: Request) {
       ["verify"]
     );
 
-    const valid = await crypto.subtle.verify(
+    const isValidSig = await crypto.subtle.verify(
       "HMAC",
       key,
       Uint8Array.from(Buffer.from(hash, "hex")),
       encoder.encode(`${fid}:${score}:${timestamp}`)
     );
 
-    if (!valid) {
+    console.log("🔐 Signature Valid?", isValidSig);
+
+    if (!isValidSig) {
+      console.warn("⛔ Invalid signature!", { hash });
       return new Response("Invalid signature", { status: 403 });
     }
 
-    // --------------------------------------------------
-    // 7. Timing sanity check (anti-fast-injection)
-    //
-    // Ultra Hard ~2 seconds per question
-    // Require at least 0.4 seconds per correct answer
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 7. Timing anti-cheat
+    // -----------------------------------------------------
     const elapsed = now - storedCreatedAt;
-    const expectedMinimumTime = score * 400; // 0.4s minimum per question
+    const expectedMinimumTime = score * 400;
+
+    console.log("⏱ Timing Check:", {
+      elapsed,
+      expectedMinimumTime,
+      score
+    });
 
     if (elapsed < expectedMinimumTime) {
+      console.warn("⛔ Timing too fast — cheating suspected");
       return new Response("Impossible score timing", { status: 403 });
     }
 
-    // --------------------------------------------------
-    // 8. Per-FID rate limit (max 1 submit/sec)
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 8. Rate limit
+    // -----------------------------------------------------
     const lastSubmitKey = `rate:user:${fid}:last`;
     const lastSubmit = await kv.get<number>(lastSubmitKey);
 
+    console.log("🚦 Last Submit:", lastSubmit);
+
     if (lastSubmit && now - lastSubmit < 1000) {
+      console.warn("⛔ Rate limited");
       return new Response("Rate limited", { status: 429 });
     }
 
     await kv.set(lastSubmitKey, now, { ex: 2 });
 
-    // --------------------------------------------------
-    // 9. Reject if new score <= old score (keep only best)
-    // --------------------------------------------------
-    const existingScore = await kv.zscore(
-      "leaderboard:ultrahard",
-      String(fid)
-    );
+    // -----------------------------------------------------
+    // 9. Only update if HIGHER score
+    // -----------------------------------------------------
+    const existingScore = await kv.zscore("leaderboard:ultrahard", String(fid));
+
+    console.log("📊 Existing Score:", existingScore);
 
     if (existingScore !== null && existingScore >= score) {
-      // Mark session used
+      console.warn("⛔ New score not higher than previous");
       await kv.hset(`session:${sessionId}`, { used: "1" });
-
       return Response.json({
         success: true,
         updated: false,
@@ -148,28 +175,32 @@ export async function POST(req: Request) {
       });
     }
 
-    // --------------------------------------------------
-    // 10. Save new username (safe)
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 10. Save user profile
+    // -----------------------------------------------------
     await kv.hset(`user:${fid}`, {
       fid: String(fid),
       username,
     });
 
-    // --------------------------------------------------
-    // 11. Save NEW high score
-    // --------------------------------------------------
+    // -----------------------------------------------------
+    // 11. Save high score
+    // -----------------------------------------------------
+    console.log("🏅 Saving NEW High Score:", score);
+
     await kv.zadd("leaderboard:ultrahard", {
       score: Number(score),
       member: String(fid),
     });
 
-    // Mark session as used
+    // Mark session used
     await kv.hset(`session:${sessionId}`, { used: "1" });
+
+    console.log("✅ SUCCESS — Score updated");
 
     return Response.json({ success: true, updated: true });
   } catch (err) {
-    console.error("Submit error:", err);
-    return new Response("Error", { status: 500 });
+    console.error("🔥 Fatal Submit Error:", err);
+    return new Response("Server error", { status: 500 });
   }
 }
