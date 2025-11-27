@@ -220,57 +220,45 @@ export default function MathGame({ fid, username }: MathGameProps) {
   // --- GAME OVER PAGE --- //
   if (gameOver) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50 to-slate-50 px-4">
-      <div className="max-w-sm w-full bg-white/90 border border-slate-200 rounded-3xl shadow-xl px-6 py-10 text-center relative overflow-hidden">
+    <div className="w-full bg-gradient-to-b from-purple-50 via-blue-50 to-slate-50 px-4 pt-10 pb-10">
+      <div className="max-w-sm w-full mx-auto bg-white/90 border border-slate-200 rounded-3xl shadow-xl px-6 py-10 text-center relative overflow-hidden">
 
-        {/* Glow */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-300/30 to-transparent blur-3xl" />
         </div>
 
         <h1 className="text-3xl font-bold text-slate-900 mb-3">Game Over</h1>
 
-        {/* Score */}
-        <div className="mt-4 mb-8">
+        <div className="mt-3 mb-8">
           <p className="text-[12px] tracking-[0.25em] text-slate-500 uppercase mb-3">
             YOUR SCORE
           </p>
 
           <div className="relative inline-block">
             <span className="absolute inset-0 bg-purple-300 blur-2xl opacity-30 rounded-full"></span>
-            <p className="relative text-8xl font-extrabold text-purple-700 drop-shadow">
-              {score}
-            </p>
+            <p className="relative text-8xl font-extrabold text-purple-700 drop-shadow">{score}</p>
           </div>
 
           <p className="text-sm text-slate-600 mt-4">
-            {score === 0
-              ? "Try again!"
-              : score < 5
-              ? "Warm-up complete!"
-              : score < 10
-              ? "Nice run!"
-              : "Incredible score!"}
+            {score === 0 ? "Try again!" :
+             score < 5 ? "Warm-up complete!" :
+             score < 10 ? "Nice run!" :
+             "Incredible score!"}
           </p>
         </div>
 
-        {/* Mode Display */}
         {lastDifficulty && (
           <div className="mb-6">
             <p className="text-[11px] text-slate-500 mb-2">MODE</p>
             <span className="px-4 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
-              {lastDifficulty === "easy"
-                ? "Easy"
-                : lastDifficulty === "hard"
-                ? "Hard"
-                : lastDifficulty === "veryhard"
-                ? "Very Hard"
-                : "Ultra Hard"}
+              {lastDifficulty === "easy" ? "Easy" :
+               lastDifficulty === "hard" ? "Hard" :
+               lastDifficulty === "veryhard" ? "Very Hard" :
+               "Ultra Hard"}
             </span>
           </div>
         )}
 
-        {/* Share Button */}
         <button
           onClick={shareToCast}
           className="w-full py-3 mb-5 rounded-xl bg-purple-600 text-white font-semibold shadow hover:bg-purple-700 transition"
@@ -278,7 +266,6 @@ export default function MathGame({ fid, username }: MathGameProps) {
           🔥 Share on Farcaster
         </button>
 
-        {/* Music Toggle */}
         <button
           onClick={toggleMusic}
           className="mb-6 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-xs text-slate-600"
@@ -286,37 +273,64 @@ export default function MathGame({ fid, username }: MathGameProps) {
           {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
         </button>
 
-        {/* Play Again Label */}
         <p className="text-xs text-slate-500 mb-3">Play Again</p>
 
-        {/* ALL MODES */}
         <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+          <button onClick={() => startGame("easy")} className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-xs font-medium shadow">Easy • 10s</button>
+          <button onClick={() => startGame("hard")} className="bg-sky-100 text-sky-700 py-3 rounded-xl text-xs font-medium shadow">Hard • 5s</button>
+          <button onClick={() => startGame("veryhard")} className="bg-orange-100 text-orange-700 py-3 rounded-xl text-xs font-medium shadow">Very Hard • 3s</button>
+          <button onClick={() => startGame("ultrahard")} className="bg-rose-100 text-rose-700 py-3 rounded-xl text-xs font-medium shadow">Ultra Hard • 2s</button>
+        </div>
 
-          <button
-            onClick={() => startGame("easy")}
-            className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-xs font-medium shadow"
-          >
+      </div>
+    </div>
+  );
+}
+
+
+
+
+  // --- HOME SCREEN --- //
+  if (!difficulty) {
+  return (
+    <div className="w-full bg-gradient-to-b from-purple-50 via-blue-50 to-slate-50 px-4 pt-10 pb-10">
+      <div className="max-w-sm w-full mx-auto bg-white/90 border border-slate-200 rounded-3xl shadow-xl px-6 py-8 text-center">
+
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+          Math Blitz
+        </h1>
+        <p className="mb-6 text-sm text-slate-600">
+          Test your reflex. Solve fast. Climb the leaderboard.
+        </p>
+
+        <button
+          onClick={toggleMusic}
+          className="mb-6 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-xs text-slate-600"
+        >
+          {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
+        </button>
+
+        <p className="text-xs text-slate-500 mb-3">Choose Difficulty</p>
+
+        <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
+
+          <button onClick={() => startGame("easy")}
+            className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-sm font-medium shadow">
             Easy • 10s
           </button>
 
-          <button
-            onClick={() => startGame("hard")}
-            className="bg-sky-100 text-sky-700 py-3 rounded-xl text-xs font-medium shadow"
-          >
+          <button onClick={() => startGame("hard")}
+            className="bg-sky-100 text-sky-700 py-3 rounded-xl text-sm font-medium shadow">
             Hard • 5s
           </button>
 
-          <button
-            onClick={() => startGame("veryhard")}
-            className="bg-orange-100 text-orange-700 py-3 rounded-xl text-xs font-medium shadow"
-          >
+          <button onClick={() => startGame("veryhard")}
+            className="bg-orange-100 text-orange-700 py-3 rounded-xl text-sm font-medium shadow">
             Very Hard • 3s
           </button>
 
-          <button
-            onClick={() => startGame("ultrahard")}
-            className="bg-rose-100 text-rose-700 py-3 rounded-xl text-xs font-medium shadow"
-          >
+          <button onClick={() => startGame("ultrahard")}
+            className="bg-rose-100 text-rose-700 py-3 rounded-xl text-sm font-medium shadow">
             Ultra Hard • 2s
           </button>
 
@@ -328,63 +342,6 @@ export default function MathGame({ fid, username }: MathGameProps) {
 }
 
 
-  // --- HOME SCREEN --- //
-  if (!difficulty) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50 to-slate-50 px-4">
-        <div className="max-w-sm w-full bg-white/90 border border-slate-200 rounded-3xl shadow-xl px-6 py-10 text-center">
-
-          <h1 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-            Math Blitz
-          </h1>
-
-          <p className="mb-6 text-sm text-slate-600">
-            Test your reflex, solve fast, climb the Ultra Hard leaderboard.
-          </p>
-
-          {/* MUSIC */}
-          <button
-            onClick={toggleMusic}
-            className="mb-6 px-4 py-2 rounded-full border border-slate-200 bg-slate-50 text-xs text-slate-600"
-          >
-            {isMusicOn ? "🔊 Music On" : "🔇 Music Off"}
-          </button>
-
-          <p className="text-xs text-slate-500 mb-3">Choose Difficulty</p>
-
-          <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-            <button
-              onClick={() => startGame("easy")}
-              className="bg-emerald-100 text-emerald-700 py-3 rounded-xl text-sm font-medium shadow"
-            >
-              Easy • 10s
-            </button>
-
-            <button
-              onClick={() => startGame("hard")}
-              className="bg-sky-100 text-sky-700 py-3 rounded-xl text-sm font-medium shadow"
-            >
-              Hard • 5s
-            </button>
-
-            <button
-              onClick={() => startGame("veryhard")}
-              className="bg-orange-100 text-orange-700 py-3 rounded-xl text-sm font-medium shadow"
-            >
-              Very Hard • 3s
-            </button>
-
-            <button
-              onClick={() => startGame("ultrahard")}
-              className="bg-rose-100 text-rose-700 py-3 rounded-xl text-sm font-medium shadow"
-            >
-              Ultra Hard • 2s
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // --- IN-GAME SCREEN --- //
   return (
