@@ -1,65 +1,60 @@
 import { kv } from "@vercel/kv";
 import crypto from "crypto";
 
-export const runtime = "nodejs";
-
-const MAX_SCORE_PER_GAME = 300;
-const MAX_TIME_DRIFT = 1000 * 5; // 5s
-
 export async function POST(req: Request) {
   try {
-    const { fid, username, score, difficulty, timestamp, sessionId, hash } = await req.json();
+    const {
+      fid,
+      username,
+      score,
+      difficulty,
+      timestamp,
+      sessionId,
+      hash,
+    } = await req.json();
 
-
-    if (!fid || typeof score !== "number" || !timestamp || !sessionId || !hash) {
+    if (!fid || !username || typeof score !== "number") {
       return new Response("Invalid payload", { status: 400 });
     }
 
-    const now = Date.now();
-    if (Math.abs(now - timestamp) > MAX_TIME_DRIFT) {
-      return new Response("Timestamp invalid", { status: 400 });
+    // ⭐ Only Ultra Hard mode is allowed
+    if (difficulty !== "ultrahard") {
+      return Response.json({
+        ignored: true,
+        reason: "Only Ultra Hard scores are tracked.",
+      });
     }
 
-    if (score < 0 || score > MAX_SCORE_PER_GAME) {
-      return new Response("Impossible score", { status: 400 });
-    }
-
+    // --- Validate anti-cheat session ---
     const sessionSecret = await kv.get<string>(`session:${sessionId}`);
     if (!sessionSecret) {
-      return new Response("Session expired or invalid", { status: 400 });
+      return new Response("Invalid session", { status: 403 });
     }
 
-    const serverHash = crypto
+    const expectedHash = crypto
       .createHmac("sha256", sessionSecret)
       .update(`${fid}:${score}:${timestamp}`)
       .digest("hex");
 
-    if (serverHash !== hash) {
+    if (expectedHash !== hash) {
       return new Response("Invalid signature", { status: 403 });
     }
 
+    // Store/Update username
     await kv.hset(`user:${fid}`, {
-    fid,
-    username,
-    difficulty, // store last mode used for highest score
+      fid,
+      username,
     });
 
-    const currentScore = await kv.zscore("leaderboard:alltime", fid.toString());
-
-    if (!currentScore || score > currentScore) {
-      await kv.zadd("leaderboard:ultrahard", {
-        member: fid.toString(),
-        score,
-        });
-    }
-
-    if (difficulty !== "ultrahard") {
-    return Response.json({ ignored: true, message: "Only Ultra Hard scores count" });
-    }
+    // ⭐ Save highest score in Ultra Hard leaderboard
+    await kv.zadd("leaderboard:ultrahard", {
+      member: fid.toString(),
+      score,
+    });
 
     return Response.json({ success: true });
   } catch (e) {
     console.error(e);
-    return new Response("Error submitting score", { status: 500 });
+    return new Response("Server error", { status: 500 });
   }
 }

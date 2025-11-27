@@ -1,19 +1,16 @@
 import { kv } from "@vercel/kv";
-import crypto from "crypto";
-
-export const runtime = "nodejs";
+import { randomUUID } from "crypto";
 
 export async function GET() {
-  const sessionId = crypto.randomBytes(16).toString("hex");
-  const sessionSecret = crypto.randomBytes(32).toString("hex");
+  const sessionId = randomUUID();
+  const sessionSecret = randomUUID(); // random secret per session
 
-  await kv.set(`session:${sessionId}`, sessionSecret, {
-    ex: 600, // 10 minutes
-  });
+  // Store in KV for 10 min expiration
+  await kv.set(`session:${sessionId}`, sessionSecret, { ex: 600 });
 
   return Response.json({
     sessionId,
     sessionSecret,
-    expiresAt: Date.now() + 10 * 60 * 1000,
+    expiresAt: Date.now() + 600000,
   });
 }
