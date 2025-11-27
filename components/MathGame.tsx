@@ -261,7 +261,7 @@ export default function MathGame({ fid, username }: MathGameProps) {
 
         <button
           onClick={shareToCast}
-          className="w-full py-3 mb-5 rounded-xl bg-purple-600 text-white font-semibold shadow hover:bg-purple-700 transition"
+          className="w-full py-3 mb-5 rounded-xl bg-purple-600 text-white font-semibold shadow hover:bg-purple-700 transition hidden"
         >
           🔥 Share on Farcaster
         </button>

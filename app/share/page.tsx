@@ -42,7 +42,7 @@ export async function generateMetadata(
         url: baseUrl + "/",
         name: "Math Blitz",
         splashImageUrl: baseUrl + "https://imgur.com/a/TOceCaM",
-        splashBackgroundColor: "#ffffff",
+        splashBackgroundColor: "#4d56f8ff",
       },
     },
   };
@@ -66,7 +66,7 @@ export default function SharePage({ searchParams }: SharePageProps) {
   const username = getParam(searchParams, "username", "Player");
 
   // 🔁 Same base URL as above
-  const baseUrl = "https://your-domain.com";
+  const baseUrl = "https://math-blitz-nine.vercel.app";
   const imageUrl = `${baseUrl}/api/share-image?score=${encodeURIComponent(
     score
   )}&username=${encodeURIComponent(username)}`;
