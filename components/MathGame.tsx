@@ -167,8 +167,12 @@ export default function MathGame({ fid, username }: MathGameProps) {
     if (!fid) return;
 
     try {
-      const sessionRes = await fetch("/api/session");
-      const session = await sessionRes.json();
+      const res = await fetch("/api/session", {
+        method: "POST",
+        body: JSON.stringify({ fid }),
+      });
+      const session = await res.json();
+
       const { sessionId, sessionSecret } = session;
 
       const timestamp = Date.now();
