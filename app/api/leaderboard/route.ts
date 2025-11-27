@@ -15,7 +15,7 @@ export async function GET(req: Request) {
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  // Get Ultra Hard leaderboard entries from KV
+  // Read ONLY Ultra Hard leaderboard
   const rawEntries = (await kv.zrange("leaderboard:ultrahard", start, end, {
     withScores: true,
     rev: true,
@@ -25,10 +25,8 @@ export async function GET(req: Request) {
   const rows: { fid: string; username: string; score: number }[] = [];
 
   for (let i = 0; i < rawEntries.length; i += 2) {
-    const fid = String(rawEntries[i]); // force string
-    const score = Number(rawEntries[i + 1]); // force number
-
-    fids.push(fid);
+    const fid = String(rawEntries[i]);
+    const score = Number(rawEntries[i + 1]);
 
     const user = (await kv.hgetall(`user:${fid}`)) as { username?: string } | null;
 
@@ -37,9 +35,11 @@ export async function GET(req: Request) {
       username: user?.username ?? "Unknown",
       score,
     });
+
+    fids.push(fid);
   }
 
-  // Fetch avatars using Neynar API (optional, requires NEYNAR_API_KEY)
+  // Avatar loading (if using NEYNAR)
   const avatars: Record<string, string> = {};
   const fallbackAvatar = "https://warpcast.com/~/favicon.ico";
 
@@ -55,17 +55,12 @@ export async function GET(req: Request) {
         }
       );
 
-      const data = (await res.json()) as any;
+      const data = await res.json();
 
-      if (data?.users && Array.isArray(data.users)) {
-        for (const user of data.users as any[]) {
-          const fidStr = String(user.fid);
-          const pfpUrl =
-            user?.pfp?.url ||
-            user?.pfp_url ||
-            fallbackAvatar;
-
-          avatars[fidStr] = pfpUrl;
+      if (Array.isArray(data?.users)) {
+        for (const u of data.users) {
+          avatars[String(u.fid)] =
+            u?.pfp?.url || u?.pfp_url || fallbackAvatar;
         }
       }
     } catch (err) {
@@ -73,7 +68,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // Merge avatar URLs into leaderboard
   const leaderboard: LeaderboardEntry[] = rows.map((r) => ({
     ...r,
     avatar: avatars[r.fid] ?? fallbackAvatar,

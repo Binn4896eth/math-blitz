@@ -46,21 +46,14 @@ export default function Leaderboard({ onClose, currentFid }: LeaderboardProps) {
 
       <div className="relative max-w-md w-full bg-white/90 backdrop-blur border border-slate-200 rounded-3xl shadow-2xl p-7">
 
-        {/* Close Button */}
+        {/* Close */}
         <button
           onClick={onClose}
-          className="
-            absolute right-4 top-4
-            w-10 h-10 flex items-center justify-center
-            rounded-full bg-white/95 border border-gray-300 shadow-md
-            text-gray-700 text-2xl hover:bg-gray-100 active:scale-95 transition
-            z-20
-          "
+          className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/95 border border-gray-300 shadow-md text-gray-700 text-2xl hover:bg-gray-100 active:scale-95 transition z-20"
         >
           ×
         </button>
 
-        {/* Title */}
         <h1 className="text-2xl font-extrabold text-center mt-10 mb-6 px-6">
           🏆 Ultra Hard Leaderboard
         </h1>
@@ -75,18 +68,11 @@ export default function Leaderboard({ onClose, currentFid }: LeaderboardProps) {
               return (
                 <li
                   key={row.fid}
-                  className={`
-                    flex items-center justify-between p-3 rounded-xl border
-                    bg-white hover:bg-gray-50 transition
-                    ${isMe ? "ring-2 ring-purple-400" : ""}
-                  `}
+                  className={`flex items-center justify-between p-3 rounded-xl border bg-white hover:bg-gray-50 transition ${isMe ? "ring-2 ring-purple-400" : ""}`}
                 >
 
-                  {/* LEFT: Rank + Avatar + Username */}
                   <div className="flex items-center gap-3">
-                    <span className={rankColor(i)}>
-                      {(page - 1) * 20 + i + 1}.
-                    </span>
+                    <span className={rankColor(i)}>{(page - 1) * 20 + i + 1}.</span>
 
                     <img
                       src={row.avatar || "https://warpcast.com/~/favicon.ico"}
@@ -97,17 +83,13 @@ export default function Leaderboard({ onClose, currentFid }: LeaderboardProps) {
                     <span className="font-medium">@{row.username}</span>
                   </div>
 
-                  {/* RIGHT: Score */}
-                  <span className="font-bold text-purple-700 text-lg">
-                    {row.score}
-                  </span>
+                  <span className="font-bold text-purple-700 text-lg">{row.score}</span>
                 </li>
               );
             })}
           </ul>
         )}
 
-        {/* Pagination */}
         <div className="flex justify-between mt-6">
           <button
             disabled={page <= 1}
