@@ -52,7 +52,7 @@ export default function MathPage() {
           rounded-2xl shadow
           font-bold text-white
           bg-purple-600 hover:bg-purple-700
-          transition
+          transition hidden
         "
       >
         🏆 View Ultra Hard Leaderboard
