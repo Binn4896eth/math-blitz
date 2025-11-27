@@ -155,7 +155,7 @@ export default function MathGame({ fid, username }: MathGameProps) {
 
   // --- SHARE CAST BUTTON --- //
   const shareToCast = () => {
-    const msg = `🔥 I scored ${score} points in Ultra Hard Mode on Math Blitz!\nPlay now: https://yourdomain.xyz`;
+    const msg = `🔥 I scored ${score} points in Ultra Hard Mode on Math Blitz!\nPlay now: https://math-blitz-nine.vercel.app/`;
 
     sdk.actions.openUrl({
       url: `https://warpcast.com/~/compose?text=${encodeURIComponent(msg)}`,

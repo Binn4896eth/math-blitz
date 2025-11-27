@@ -7,14 +7,14 @@ export async function generateMetadata(): Promise<Metadata> {
     other: {
       "fc:miniapp": JSON.stringify({
         version: "next",
-        imageUrl: "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
+        imageUrl: "https://imgur.com/a/TOceCaM",
         button: {
           title: "Launch Math Blitz",
           action: {
             type: "launch_miniapp",
             name: "Math Blitz",
             url: "https://math-blitz-nine.vercel.app/",
-            splashImageUrl: "https://math-blitz-nine.vercel.app/math-blitz-logo.png",
+            splashImageUrl: "https://imgur.com/a/TOceCaM",
             splashBackgroundColor: "#4d56f8ff",
           },
         },
@@ -22,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
   };
 }
+
 
 export default function RootLayout({
   children,
